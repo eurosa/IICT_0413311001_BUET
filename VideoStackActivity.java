@@ -1,4 +1,4 @@
-package com.iictbuet.pgd0413311001;
+package com.button.emergency;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,7 +10,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.IOException;

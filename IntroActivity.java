@@ -1,11 +1,9 @@
-package com.iictbuet.pgd0413311001;
+package com.button.emergency;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,8 +11,8 @@ import android.widget.TextView;
 
 public class IntroActivity extends Activity {
 	final String messages [] = {
-			"Welcome to Emergency Button, enter a phone number, email and message. They'll be saved for an iictbuet.",
-			"When you press the iictbuet pgd0413311001, or both widget buttons within 5 seconds, the distress signal is sent.",
+			"Welcome to Emergency Button, enter a phone number, email and message. They'll be saved for an emergency button.",
+			"When you press the emergency button, or both widget buttons within 5 seconds, the distress signal is sent.",
 			"Add the widget at your home screen using:\nMenu->Add->Widgets->Emergency Button"
 		};
 	
@@ -26,8 +24,8 @@ public class IntroActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.intro_activity_layout);
-		
-		Button btnNext = (Button) findViewById(R.id.btnNext);
+
+		Button btnNext =  findViewById(R.id.btnNext);
 
 		btnNext.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
@@ -56,7 +54,7 @@ public class IntroActivity extends Activity {
 	}
 	
 	public void updateSlide() {
-		final TextView txt = (TextView) findViewById(R.id.txtExplain);
+		final TextView txt =  findViewById(R.id.txtExplain);
 
 		txt.setText(messages[currentSlide]);
 	}

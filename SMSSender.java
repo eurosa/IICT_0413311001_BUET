@@ -1,8 +1,6 @@
-package com.iictbuet.pgd0413311001;
+package com.button.emergency;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.Activity;
@@ -12,24 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.telephony.SmsManager;
-import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
-
-import com.klinker.android.send_message.Message;
-import com.klinker.android.send_message.Settings;
-import com.klinker.android.send_message.Transaction;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import static android.R.attr.name;
-import static com.iictbuet.pgd0413311001.EmergencyActivity.KEY_IMAGE;
-import static com.iictbuet.pgd0413311001.EmergencyActivity.KEY_TEXT;
 
 public class SMSSender {
 

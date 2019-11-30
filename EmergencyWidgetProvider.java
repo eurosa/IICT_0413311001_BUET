@@ -1,4 +1,4 @@
-package com.iictbuet.pgd0413311001;
+package com.button.emergency;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -79,7 +79,7 @@ public class EmergencyWidgetProvider extends AppWidgetProvider {
 			myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			context.startActivity(myIntent);
 
-			//Emergency.emergencyNow(context);
+
 		}
 
 		super.onReceive(context, intent);

@@ -1,4 +1,4 @@
-package com.iictbuet.pgd0413311001;
+package com.button.emergency;
 
 
 import java.io.ByteArrayOutputStream;
@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.ImageView;
 
 public class EmergencyData {
@@ -126,8 +125,8 @@ public class EmergencyData {
 
 
         selectedImagePath=mSettings.getString(nameImage, "");
-//        bitmap = BitmapFactory.decodeFile(selectedImagePath);
-//        imgPreview.setImageBitmap(bitmap);
+//       bitmap = BitmapFactory.decodeFile(selectedImagePath);
+  //     imgPreview.setImageBitmap(bitmap);
         return selectedImagePath;
 
     }
@@ -167,8 +166,7 @@ public void setImage(Uri imaPath){
 
 	SharedPreferences.Editor editor = mSettings.edit();
  	editor.putString(nameImage, imaPath.getPath());
-// 	editor.putString(nameImage, imaPath.toString());
-//	editor.putString(IMAGE, encodeTobase64(yourbitmap));
+
 	editor.commit();
 }
 
@@ -177,8 +175,7 @@ public void setImage(Uri imaPath){
 		SharedPreferences.Editor editor = mSettings.edit();
 		editor.putString(video, videoPath.getPath());
 
-// 	editor.putString(nameImage, imaPath.toString());
-//	editor.putString(IMAGE, encodeTobase64(yourbitmap));
+
 		editor.commit();
 	}
 
@@ -186,14 +183,14 @@ public void setImage(Uri imaPath){
 
 			String imageEncoded = null;
 		if (image != null) {
-			System.out.println(image + "Radhason");
+
 			Bitmap immage = image;
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			immage.compress(Bitmap.CompressFormat.PNG, 100, baos);
 			byte[] b = baos.toByteArray();
 			imageEncoded = Base64.encodeToString(b, Base64.DEFAULT);
 
-			Log.d("Radhason", imageEncoded);
+
 		}
 			return imageEncoded;
 		}

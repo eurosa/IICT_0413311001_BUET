@@ -1,4 +1,4 @@
-package com.iictbuet.pgd0413311001;
+package com.button.emergency;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,12 +13,7 @@ import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
-
-import static android.content.ContentValues.TAG;
-import static com.iictbuet.pgd0413311001.R.id.ibCapture;
 
 public class MyService extends Service implements SensorEventListener {
 
@@ -64,7 +58,7 @@ public class MyService extends Service implements SensorEventListener {
 //  		final EmergencyButtonActivity emergencyButtonActivity = new EmergencyButtonActivity();
 //			if (emergencyButtonActivity != null) {
 				EmergencyActivity.armEmergencyActivity(getApplicationContext());
-System.out.println("radhasonobject"+getApplicationContext());
+
 //				Intent myIntent = new Intent(getApplicationContext(), EmergencyActivity.class);
  		Intent myIntent = new Intent(getApplicationContext(), EmergencyButtonActivity.class);
 				// FLAG_ACTIVITY_NEW_TASK is needed because we're not in an activity

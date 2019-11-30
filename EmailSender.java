@@ -1,4 +1,4 @@
-package com.iictbuet.pgd0413311001;
+package com.button.emergency;
 
 import java.io.BufferedReader;
 
@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 
@@ -19,12 +18,11 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
 import org.json.JSONObject;
 
-import static com.iictbuet.pgd0413311001.EmergencyActivity.KEY_IMAGE;
-import static com.iictbuet.pgd0413311001.EmergencyActivity.KEY_TEXT;
+import static com.button.emergency.EmergencyActivity.KEY_IMAGE;
+import static com.button.emergency.EmergencyActivity.KEY_TEXT;
 
 public class EmailSender {
 	private static String LOG_TAG = "EmailSender";

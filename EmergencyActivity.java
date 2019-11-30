@@ -1,4 +1,4 @@
-package com.iictbuet.pgd0413311001;
+package com.button.emergency;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.iictbuet.pgd0413311001.SMSSender.SMSListener;
+import com.button.emergency.SMSSender.SMSListener;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -85,24 +85,28 @@ public class EmergencyActivity extends Activity {
         
         setContentView(R.layout.emergency_activity_layout);
 
-		mRadarView = (RadarView) findViewById(R.id.radarView);
+		mRadarView = findViewById(R.id.radarView);
 
 		mRadarView.setShowCircles(true);
 
-	//	Button btnOk = (Button) findViewById(R.id.btnOkDone);
-//		btnOk.setOnClickListener(new View.OnClickListener() {
-//			public void onClick(View v) {
-//				EmergencyActivity.this.finish();
-//			}
-//		});
-//
-		Button btnConfigure = (Button) findViewById(R.id.btnConfigure);
+		Button btnOk = findViewById(R.id.btnOkDone);
+		btnOk.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				EmergencyActivity.this.finish();
+			}
+		});
+
+		Button btnConfigure =  findViewById(R.id.btnConfigure);
 
 		btnConfigure.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 
                     // TODO Auto-generated method stub
                 stopService(new Intent(getApplicationContext(), MyService.class));
+
+
+				EmergencyButtonActivity.releaseCamera();
+//               EmergencyButtonActivity.createCamera();
 
 
 				Intent myIntent = new Intent(EmergencyActivity.this, EmergencyButtonActivity.class);
@@ -184,14 +188,14 @@ public class EmergencyActivity extends Activity {
 		
 		mLiveThis = this;
 		
-		txtEmail = (TextView)findViewById(R.id.txtEmail);
-		txtLocation = (TextView)findViewById(R.id.txtLocation);
-		txtSms = (TextView)findViewById(R.id.txtSMS);
-		mRadarView = (RadarView) findViewById(R.id.radarView);
+		txtEmail = findViewById(R.id.txtEmail);
+		txtLocation = findViewById(R.id.txtLocation);
+		txtSms = findViewById(R.id.txtSMS);
+		mRadarView =  findViewById(R.id.radarView);
 
-		imgEmail = (ImageView)findViewById(R.id.imgEmail);
-		imgLocation = (ImageView)findViewById(R.id.imgLocation);
-		imgSms = (ImageView)findViewById(R.id.imgSMS);
+		imgEmail = findViewById(R.id.imgEmail);
+		imgLocation = findViewById(R.id.imgLocation);
+		imgSms = findViewById(R.id.imgSMS);
 
 		resumeEmergency();
 	}
@@ -272,7 +276,7 @@ public class EmergencyActivity extends Activity {
 		startActivity(gpsOptionsIntent);
 	}
 
-	
+
 	private void setLocationState(String locationString, int locationState) {
 		EmergencyActivity.locationString = locationString;
 		EmergencyActivity.locationState = locationState;
@@ -402,10 +406,9 @@ public class EmergencyActivity extends Activity {
 		}
 		
 		private String mapsUrl(Location location) {
-			String locString = Double
-			.toString(location.getLatitude())
+			String locString = (location.getLatitude())
 			+ ","
-			+ Double.toString(location.getLongitude());
+			+ (location.getLongitude());
 	
 			String mapsUrl = "http://maps.google.com/maps?q=" + locString;
 			return mapsUrl;

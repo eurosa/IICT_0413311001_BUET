@@ -1,11 +1,10 @@
-package com.iictbuet.pgd0413311001;
+package com.button.emergency;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,23 +15,21 @@ import com.nullwire.trace.ExceptionHandler;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.LocationManager;
 import android.media.CamcorderProfile;
 import android.media.ExifInterface;
 import android.media.MediaRecorder;
@@ -42,6 +39,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Display;
 import android.view.SurfaceHolder;
@@ -55,7 +53,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.view.Gravity;
 import android.view.Menu;
@@ -65,9 +62,11 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.VideoView;
 
+import static com.android.mms.LogTag.TAG;
+
 @SuppressWarnings("ALL")
-public class EmergencyButtonActivity extends Activity implements SensorEventListener {
-    public Camera mCamera;
+public class  EmergencyButtonActivity extends Activity implements SensorEventListener {
+    public static Camera mCamera;
 	public CameraPreview mPreview;
 	public SensorManager sensorManager = null;
 	public int orientation;
@@ -77,16 +76,16 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
 	public Button ibUse;
 	public Button ibCapture;
 	public FrameLayout flBtnContainer;
-	public File sdRoot;
+	public static File sdRoot;
 	public String dir;
 	public String fileName;
 	public ImageView rotatingImage;
 	public int degrees = -1;
 	ImageView iv;
-	LinearLayout linearLayout;
-	public MediaRecorder mediaRecorder;
-	Button myButton;
-	boolean recording;
+	FrameLayout linearLayout;
+	public static MediaRecorder mediaRecorder;
+	static Button myButton;
+	static boolean recording;
 	static public MoreEditText mPhonesMoreEditText = null;
 	static public MoreEditText mEmailsMoreEditText = null;
 
@@ -99,10 +98,10 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
 	Button btnCapturePicture;
 	// directory name to store captured images and videos
 	public static final String IMAGE_DIRECTORY_NAME = "POWER";
-	public MyCameraSurfaceView myCameraSurfaceView;
+	public static MyCameraSurfaceView myCameraSurfaceView;
 	public Uri fileUri; // file url to store image/video
 	public  Uri imageUri;
-	public  Uri videoUri;
+	public static Uri videoUri;
 
 	public ImageView imgPreview;
 	public VideoView videoPreview;
@@ -116,7 +115,12 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
 
 		ExceptionHandler.register(this, new StackMailer());
 
-		String[] perms = {"android.permission.FINE_LOCATION", "android.permission.CAMERA"};
+		String[] perms = {"android.permission.FINE_LOCATION", "android.permission.CAMERA",
+				"android.permission.WRITE_EXTERNAL_STORAGE","android.permission.READ_EXTERNAL_STORAGE",
+				"android.permission.READ_INTERNAL_STORAGE","android.hardware.camera","android.permission.ACCESS_FINE_LOCATION",
+				"android.permission.INTERNET","android.permission.WRITE_SETTINGS","android.permission.WRITE_SECURE_SETTINGS"
+				,"android.permission.CHANGE_NETWORK_STATE"
+		};
 
 		int permsRequestCode = 200;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -126,6 +130,24 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
         sdRoot = Environment.getExternalStorageDirectory();
         dir = "/DCIM/Camera/";
 
+		//Intent intent_gps=new Intent("android.location.GPS_ENABLED_CHANGE");
+		//intent_gps.putExtra("enabled", true);
+		//sendBroadcast(intent_gps);
+		//turnGpsOn(this);
+		//Intent intent = new Intent("android.location.GPS_ENABLED_CHANGE");
+		//intent.putExtra("enabled", true);
+		//this.sendBroadcast(intent);
+
+		String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+		if(!provider.contains("gps")){ //if gps is disabled
+			final Intent poke = new Intent();
+			poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+			poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+			poke.setData(Uri.parse("3"));
+			this.sendBroadcast(poke);
+
+
+		}
         // Getting all the needed elements from the layout
 //        rotatingImage = (ImageView) findViewById(R.id.imageView1);
 
@@ -165,10 +187,51 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
 			// will close the app if the device does't have cameras
 			finish();
 		}
-		Intent intent = new Intent(this, MyService.class);
+		Intent intent1 = new Intent(this, MyService.class);
+		//if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		//	if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+				Log.d(TAG,"Permission is granted");
+				releaseCamera();
+				createCamera();
+
+		//}
+		//}
+
+
 		//Start Service
-		startService(intent);
+		startService(intent1);
 	}
+
+	private void turnGpsOn (Context context) {
+		/*String beforeEnable = Settings.Secure.getString(context.getContentResolver(),
+				Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+		String newSet = String.format ("%s,%s",
+				beforeEnable,
+				LocationManager.GPS_PROVIDER);
+		try {
+			Settings.Secure.putString (context.getContentResolver(),
+					Settings.Secure.LOCATION_PROVIDERS_ALLOWED,
+					newSet);
+		} catch(Exception e) {}*/
+		try
+		{
+
+			String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+
+
+			if(!provider.contains("gps")){ //if gps is disabled
+				final Intent poke = new Intent();
+				poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+				poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+				poke.setData(Uri.parse("3"));
+				sendBroadcast(poke);
+			}
+		}
+		catch (Exception e) {
+
+		}
+	}
+
 
 	@Override
 	public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
@@ -202,6 +265,7 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
 	public void createCamera() {
         // Create an instance of Camera
 		try {
+			releaseCamera();
 			mCamera = getCameraInstance();
 
 			// Setting the right parameters in the camera
@@ -264,7 +328,7 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
 
 							//Release Camera before MediaRecorder start
 							releaseCamera();
-
+//createCamera();
 							if(!prepareMediaRecorder()){
 								Toast.makeText(EmergencyButtonActivity.this,
 										"Fail in prepareMediaRecorder()!\n - Ended -",
@@ -289,7 +353,7 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
 		}
     }
 
-	private boolean prepareMediaRecorder(){
+	private static boolean prepareMediaRecorder(){
 		mCamera = getCameraInstance();
 		mCamera.setDisplayOrientation(90);
 		mediaRecorder = new MediaRecorder();
@@ -346,7 +410,7 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
 
 
 
-	private void releaseMediaRecorder(){
+	private static void releaseMediaRecorder(){
 		if (mediaRecorder != null) {
 			mediaRecorder.reset();   // clear recorder configuration
 			mediaRecorder.release(); // release the recorder object
@@ -355,14 +419,14 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
 		}
 	}
 
-	private void releaseCamera(){
+	public static void releaseCamera(){
 		if (mCamera != null){
 			mCamera.release();        // release the camera for other applications
 			mCamera = null;
 		}
 	}
 
-	private String getFileName_CustomFormat() {
+	private static String getFileName_CustomFormat() {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH_mm_ss");
 		Date now = new Date();
 		String strDate = sdfDate.format(now);
@@ -455,7 +519,7 @@ public class EmergencyButtonActivity extends Activity implements SensorEventList
 				bitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-				linearLayout = (LinearLayout) findViewById(R.id.linearl);
+				linearLayout = (FrameLayout) findViewById(R.id.linearl);
 				Log.d("Earth", "Love" + iv);
 				if (iv != null) {
 					linearLayout.removeView(iv);
@@ -769,7 +833,9 @@ if(ibCapture.performClick()==true){
 
         String sd = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(sd)) {
-            state = true;
+			Log.d("sdfcard","jkjlkjs: "+sd);
+
+			state = true;
         }
 
         return state;
@@ -798,9 +864,9 @@ if(ibCapture.performClick()==true){
 			imageUri= Uri.fromFile(pictureFile.getAbsoluteFile());
 
             try {
-//				Toast.makeText(getApplicationContext(),
-//						"Radhason to send image"+imageUri+"Path"+imageUri.getPath(), Toast.LENGTH_LONG)
-//						.show();
+			//Toast.makeText(getApplicationContext(),
+			//		"Radhason to send image"+imageUri+"Path"+imageUri.getPath(), Toast.LENGTH_LONG)
+			//			.show();
                 FileOutputStream purge = new FileOutputStream(pictureFile);
                 purge.write(data);
                 purge.close();
@@ -825,7 +891,7 @@ if(ibCapture.performClick()==true){
 			bitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();
 			bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-			linearLayout = (LinearLayout) findViewById(R.id.linearl);
+			linearLayout = (FrameLayout) findViewById(R.id.linearl);
 			Log.d("Earth","Love"+iv);
 			if(iv!=null) {
 				linearLayout.removeView(iv);
@@ -1251,7 +1317,7 @@ try {
 					bitmap = Bitmap.createScaledBitmap(bitmap, 300, 200, true);
 					ByteArrayOutputStream stream = new ByteArrayOutputStream();
 					bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-					linearLayout = (LinearLayout) findViewById(R.id.linearl);
+					linearLayout = (FrameLayout) findViewById(R.id.linearl);
 //		final Button btn = (Button) findViewById(R.id.btn);
 					iv = new ImageView(getApplicationContext());
 					iv.setImageBitmap(bitmap);
@@ -1276,7 +1342,7 @@ try {
 				bitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, true);
 				ByteArrayOutputStream stream = new ByteArrayOutputStream();
 				bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-				linearLayout = (LinearLayout) findViewById(R.id.linearl);
+				linearLayout = (FrameLayout) findViewById(R.id.linearl);
 //		final Button btn = (Button) findViewById(R.id.btn);
 				iv = new ImageView(getApplicationContext());
 				iv.setImageBitmap(bitmap);
